@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <% include ./partials/_header %>
+<body>
+<ul>
+  <% for (var i in urls) { %>
+    <li> <a><%= i %></a> -> <%= urls[i] %> <form method="POST" action="/urls/<%= i %>/delete"> <input type="submit" value="Delete">
+  </form></li> <a>
+
+
+<%}%>
+
+
+  <% include ./partials/_footer %>
+</body>
+</html>
