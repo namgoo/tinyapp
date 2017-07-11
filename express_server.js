@@ -1,3 +1,4 @@
+var morgan = require('morgan')
 var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
@@ -6,12 +7,26 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 var cookieParser = require('cookie-parser')
 app.use(cookieParser())
-
+app.use(morgan())
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 
 
 function generateRandomString() {
@@ -24,13 +39,11 @@ function generateRandomString() {
   return text;
 }
 
+
 // "/"
 app.get("/", (req, res) => {
   res.end("Hello!");
 });
-
-//
-
 
 
 // *********** /URLS *****************
@@ -38,16 +51,16 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
 
   console.log('index')
-  let templateVars = { urls: urlDatabase, username: req.cookies["username"]
- }
+  let templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] }
+  console.log(templateVars.user)
   res.render("urls_index", templateVars) ;
+
 });
 
 
 app.post("/urls", (req, res) => {
 
   let shortURL = generateRandomString()
-
   urlDatabase[shortURL] = req.body['longURL']
   res.redirect('/urls/' + shortURL)
 
@@ -64,13 +77,18 @@ app.get("/urls.json", (req, res) => {
 });
 
 
-
 // ********* 'urls/new' *********
 
 app.get("/urls/new", (req, res) => {
-   let templateVars = { urls: urlDatabase, username: req.cookies["username"]
- }
-  res.render('urls_new', templateVars)
+  let templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] }
+  console.log("Something" , req.cookies["user_id"])
+  if ( req.cookies["user_id"] ) {
+        console.log("Something 3", typeof req.cookies["user_id"])
+
+    res.render('urls_new', templateVars)
+  } else {
+    res.redirect("/login")
+  }
 });
 
 
@@ -78,7 +96,7 @@ app.get("/urls/new", (req, res) => {
 // ********* urls/id *********
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id]};
+  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], user: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
@@ -96,6 +114,7 @@ app.post("/urls/:id", (req, res) => {
 
 
 // ********* hello *********
+
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
@@ -129,25 +148,74 @@ app.get("/u/:shortURL", (req, res) => {
 
 // ********* /login *********
 
-app.post("/login", (req, res) => {
+app.get("/login", (req, res) => {
+  let templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] }
+  res.render('urls_login',templateVars)
+})
 
-  console.log("req.body = " , req.body)
-  res.cookie('username', req.body['username'])
-  res.redirect('/urls')
+app.post("/login", (req, res) => {
+  console.log('req.body = ' , req.body)
+
+  for (var userid in users) {
+    if (req.body.email === users[userid].email) {
+      if (req.body.password === users[userid].password) {
+      res.cookie('user_id', userid)
+      res.redirect('/')
+      return
+      }
+    }
+  }
+res.status(403).send()
+
 });
 
 
 // ********* /logout *********
 
+app.get("/logout"), (req, res) => {
+ res.send("you are logged out!")
+}
+
+
+
 app.post("/logout", (req, res) => {
-  console.log("is username deleted?" , username)
-  // req.clearCookie('username')
+  res.clearCookie('user_id')
   res.redirect('/urls')
 });
 
 
+// ********* /register *********
 
-// ********* Listen *********
+app.get("/register", (req, res) => {
+  res.render('urls_register')
+});
+
+
+app.post("/register", (req, res) => {
+  let randomid = generateRandomString();
+
+  if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send({error: "No empties!"})
+      return
+  }
+
+  for (id in users) {
+    if (users[id]['email'] === req.body.email) {
+      res.status(400).send({error: "The email is already registered!"})
+      return
+    }
+  }
+
+  users[randomid] = { id: randomid ,
+    email: req.body.email,
+    password: req.body.password}
+  res.cookie('user_id',randomid)
+  console.log(users)
+
+  res.render('urls_register')
+});
+
+// ********* /Listen *********
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
