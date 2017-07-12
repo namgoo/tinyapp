@@ -42,7 +42,7 @@ function generateRandomString() {
 
 // "/"
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  res.end("Hello! It's TinyApp!!");
 });
 
 
