@@ -5,8 +5,9 @@
 <body>
 <ul>
   <% for (var i in urls) { %>
-    <li> <a><%= i %></a> -> <%= (urls[i].longestURL) %> <form method="POST" action="/urls/<%= i %>/delete"> <input type="submit" value="Delete">
-  </form></li> <a>
+    <li> <a><%= i %></a> -> <%= (urls[i].longURL) %> <form method="POST" action="/urls/<%= i %>/delete?_method=DELETE"> <input type="submit" value="Delete">
+  </form> <form method ="GET" action="/urls/<%= i %>"> <input type="submit" value="Edit"> </form>
+  </li> <a>
 
 
 <%}%>

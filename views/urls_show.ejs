@@ -8,8 +8,8 @@
   <ul>
     <!-- <li> <%= longURL %>, <a href="<%= shortURL %>"> <%= shortURL %> </a> </li> -->
     <a> "ShortURL: " <%= shortURL %> </a>
-    <form action="/urls/<%= shortURL %>" method="POST" style="margin:150px;">
-      <label for="longURL"> New URL         </label>
+    <form action="/urls/<%= shortURL %>?_method=PUT" method="POST" style="margin:150px;">
+      <label for="longURL"> New URL (Please specify protocal - http:// or https://)        </label>
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Update">
 
