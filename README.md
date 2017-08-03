@@ -4,7 +4,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Starting Page with "Hello!"](https://github.com/namgoo/tinyapp/blob/master/docs/starting_page.png)
+
 !["URLs page"](https://github.com/namgoo/tinyapp/blob/master/docs/urls.png)
 !["Register Page"](https://github.com/namgoo/tinyapp/blob/master/docs/register.png)
 !["Login Page"](https://github.com/namgoo/tinyapp/blob/master/docs/login.png)
